@@ -41,6 +41,14 @@ class WorkoutExercise extends Model
     protected $table = 'workout_exercises';
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\WorkoutExerciseFactory::new();
+    }
+
+    /**
      * Indicates if the model should be timestamped.
      */
     public $timestamps = false;

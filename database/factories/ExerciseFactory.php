@@ -30,14 +30,14 @@ class ExerciseFactory extends Factory
         $muscleGroups = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core', 'Glutes', 'Calves'];
 
         return [
-            'trainer_id' => TrainerProfile::factory(),
+            'creator_id' => TrainerProfile::factory(),
             'name' => fake()->words(3, true),
             'description' => fake()->optional()->paragraph(),
             'instructions' => fake()->optional()->paragraphs(3, true),
             'primary_muscle_groups' => fake()->randomElements($muscleGroups, fake()->numberBetween(1, 2)),
             'secondary_muscle_groups' => fake()->optional()->randomElements($muscleGroups, fake()->numberBetween(1, 2)),
             'difficulty' => fake()->randomElement(Difficulty::cases()),
-            'performance_type' => fake()->randomElement(PerformanceType::cases()),
+            'exercise_type' => fake()->randomElement(PerformanceType::cases()),
             'type' => ExerciseType::CUSTOM,
             'visibility' => ExerciseVisibility::PRIVATE,
         ];

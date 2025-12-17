@@ -20,7 +20,6 @@ class ExerciseLogResource extends JsonResource
                 'id' => $this->exercise->id,
                 'name' => $this->exercise->name,
             ],
-            'sort_order' => $this->sort_order,
             'status' => $this->status->value,
             'started_at' => $this->started_at?->toISOString(),
             'completed_at' => $this->completed_at?->toISOString(),

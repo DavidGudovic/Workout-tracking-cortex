@@ -28,6 +28,7 @@ class WorkoutSessionFactory extends Factory
         return [
             'trainee_id' => TraineeProfile::factory(),
             'workout_id' => Workout::factory(),
+            'workout_version' => 1,
             'started_at' => now(),
             'status' => SessionStatus::STARTED,
         ];

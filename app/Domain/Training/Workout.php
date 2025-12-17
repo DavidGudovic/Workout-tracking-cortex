@@ -52,6 +52,14 @@ class Workout extends Model
     protected $table = 'workouts';
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\WorkoutFactory::new();
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -98,6 +106,7 @@ class Workout extends Model
      * @var array<string, mixed>
      */
     protected $attributes = [
+        'difficulty' => 'beginner',
         'pricing_type' => 'free',
         'currency' => 'USD',
         'status' => 'draft',

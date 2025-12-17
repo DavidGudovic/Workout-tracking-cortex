@@ -6,6 +6,8 @@ use App\Domain\Identity\User;
 use App\Shared\Enums\GymStatus;
 use App\Shared\Traits\Cacheable;
 use App\Shared\Traits\HasUuid;
+use Database\Factories\GymFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,6 +44,11 @@ use Illuminate\Support\Str;
 class Gym extends Model
 {
     use HasFactory, HasUuid, Cacheable;
+
+    static function newFactory(): GymFactory
+    {
+        return GymFactory::new();
+    }
 
     /**
      * The table associated with the model.

@@ -53,6 +53,14 @@ class WorkoutSession extends Model
     public $timestamps = false;
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\WorkoutSessionFactory::new();
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -274,11 +282,12 @@ class WorkoutSession extends Model
      */
     public function complete(): void
     {
+        $this->completed_at = now();
         $this->calculateTotals();
 
         $this->update([
             'status' => SessionStatus::COMPLETED,
-            'completed_at' => now(),
+            'completed_at' => $this->completed_at,
         ]);
     }
 

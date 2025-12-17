@@ -25,7 +25,6 @@ class SetLogResource extends JsonResource
             'rpe' => $this->rpe,
             'is_warmup' => $this->is_warmup,
             'is_failure' => $this->is_failure,
-            'notes' => $this->notes,
         ];
     }
 }

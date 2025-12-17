@@ -16,17 +16,18 @@ class WorkoutSessionResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'workout_id' => $this->workout_id,
             'workout' => [
                 'id' => $this->workout->id,
                 'name' => $this->workout->name,
             ],
             'status' => $this->status->value,
-            'started_at' => $this->started_at->toISOString(),
+            'started_at' => $this->started_at?->toISOString(),
             'completed_at' => $this->completed_at?->toISOString(),
             'total_duration_minutes' => $this->total_duration_minutes,
             'total_volume_kg' => $this->total_volume_kg,
             'exercise_logs' => ExerciseLogResource::collection($this->whenLoaded('exerciseLogs')),
-            'created_at' => $this->created_at->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
         ];
     }
 }

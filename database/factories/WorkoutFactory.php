@@ -27,7 +27,7 @@ class WorkoutFactory extends Factory
     public function definition(): array
     {
         return [
-            'trainer_id' => TrainerProfile::factory(),
+            'creator_id' => TrainerProfile::factory(),
             'name' => fake()->words(3, true),
             'description' => fake()->optional()->paragraph(),
             'difficulty' => fake()->randomElement(Difficulty::cases()),

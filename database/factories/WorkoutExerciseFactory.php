@@ -27,7 +27,7 @@ class WorkoutExerciseFactory extends Factory
         return [
             'workout_id' => Workout::factory(),
             'exercise_id' => Exercise::factory(),
-            'order_index' => 0,
+            'sort_order' => 0,
             'sets' => fake()->numberBetween(2, 5),
             'target_reps' => fake()->numberBetween(6, 15),
             'target_duration_seconds' => null,

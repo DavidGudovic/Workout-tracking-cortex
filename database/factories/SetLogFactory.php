@@ -32,7 +32,6 @@ class SetLogFactory extends Factory
             'rpe' => fake()->optional()->numberBetween(5, 10),
             'is_warmup' => false,
             'is_failure' => false,
-            'notes' => fake()->optional()->sentence(),
         ];
     }
 

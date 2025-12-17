@@ -28,8 +28,8 @@ class WorkoutExerciseResource extends JsonResource
                 'name' => $this->exercise->name,
                 'description' => $this->exercise->description,
                 'primary_muscle_groups' => $this->exercise->primary_muscle_groups,
-                'difficulty' => $this->exercise->difficulty->value,
-                'performance_type' => $this->exercise->performance_type->value,
+                'difficulty' => $this->exercise->difficulty?->value,
+                'performance_type' => $this->exercise->performance_type?->value,
             ],
         ];
     }

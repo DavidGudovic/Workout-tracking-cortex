@@ -31,14 +31,10 @@ class GymFactory extends Factory
             'name' => $name,
             // slug will be auto-generated from name
             'description' => fake()->optional()->paragraph(),
-            'address' => fake()->streetAddress(),
             'city' => fake()->city(),
             'state' => fake()->stateAbbr(),
-            'zip_code' => fake()->postcode(),
             'country' => 'USA',
             'phone' => fake()->phoneNumber(),
-            'email' => fake()->unique()->companyEmail(),
-            'website' => fake()->optional()->url(),
             'logo_url' => fake()->optional()->imageUrl(200, 200, 'fitness'),
             'status' => GymStatus::ACTIVE,
         ];

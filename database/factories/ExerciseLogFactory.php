@@ -27,8 +27,8 @@ class ExerciseLogFactory extends Factory
     {
         return [
             'workout_session_id' => WorkoutSession::factory(),
+            'workout_exercise_id' => \App\Domain\Training\WorkoutExercise::factory(),
             'exercise_id' => Exercise::factory(),
-            'order_index' => 0,
             'status' => ExerciseLogStatus::PENDING,
         ];
     }
