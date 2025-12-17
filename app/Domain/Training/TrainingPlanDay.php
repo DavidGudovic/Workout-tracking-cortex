@@ -252,4 +252,12 @@ class TrainingPlanDay extends Model
     {
         return $this->is_rest_day || $this->hasWorkouts();
     }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\TrainingPlanDayFactory::new();
+    }
 }

@@ -28,13 +28,13 @@ class TrainingPlanFactory extends Factory
     public function definition(): array
     {
         return [
-            'trainer_id' => TrainerProfile::factory(),
+            'creator_id' => TrainerProfile::factory(),
             'name' => fake()->words(3, true) . ' Program',
             'description' => fake()->optional()->paragraph(),
             'duration_weeks' => fake()->randomElement([4, 6, 8, 12, 16]),
             'days_per_week' => fake()->numberBetween(3, 6),
             'difficulty' => fake()->randomElement(Difficulty::cases()),
-            'fitness_goal' => fake()->randomElement(FitnessGoal::cases()),
+            'goal' => fake()->randomElement(FitnessGoal::cases()),
             'pricing_type' => PricingType::FREE,
             'price_cents' => null,
             'status' => WorkoutStatus::DRAFT,

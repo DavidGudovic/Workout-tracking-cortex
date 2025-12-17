@@ -239,4 +239,12 @@ class TrainingPlanWorkout extends Model
             ->orderBy('sort_order')
             ->first();
     }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\TrainingPlanWorkoutFactory::new();
+    }
 }

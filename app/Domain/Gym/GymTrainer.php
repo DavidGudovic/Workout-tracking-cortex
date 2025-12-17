@@ -34,6 +34,14 @@ class GymTrainer extends Model
     use HasFactory, HasUuid;
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\GymTrainerFactory::new();
+    }
+
+    /**
      * The table associated with the model.
      */
     protected $table = 'gym_trainers';

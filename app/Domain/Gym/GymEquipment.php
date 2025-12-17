@@ -28,6 +28,14 @@ class GymEquipment extends Model
     use HasFactory, HasUuid;
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\GymEquipmentFactory::new();
+    }
+
+    /**
      * The table associated with the model.
      */
     protected $table = 'gym_equipment';

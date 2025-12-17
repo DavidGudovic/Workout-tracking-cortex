@@ -190,4 +190,12 @@ class TrainingPlanWeek extends Model
 
         return true;
     }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\TrainingPlanWeekFactory::new();
+    }
 }
