@@ -11,12 +11,12 @@ use App\Http\Controllers\Api\WorkoutController;
 use App\Http\Controllers\Api\WorkoutSessionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/health-check', function () {
-    return response()->json(['status' => 'ok']);
-});
 
 // API v1 routes
 Route::prefix('v1')->group(function () {
+    Route::get('/health-check', function () {
+        return response()->json(['status' => 'ok', 'message' => 'Health check passed.']);
+    });
 
     // Public auth routes
     Route::post('/auth/register', [AuthController::class, 'register']);
