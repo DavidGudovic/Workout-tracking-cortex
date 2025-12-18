@@ -18,5 +18,4 @@ jobs:
             cd ~/workouts-api
             git pull origin main
             cd deployment
-            docker compose up -d --build
             docker compose exec -T app php artisan migrate --force
