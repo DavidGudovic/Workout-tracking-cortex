@@ -1,0 +1,89 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, bcmath, intl, gd, exif, iconv, redis
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-dev --optimize-autoloader
+
+      - name: Run tests before deploy
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
+          cp .env.example .env
+          echo "DB_CONNECTION=pgsql" >> .env
+          php artisan key:generate
+          # Add your test database setup here
+          # php artisan test
+
+      # Example deployment steps - customize based on your deployment method
+
+      # Option 1: Deploy via SSH
+      # - name: Deploy via SSH
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.DEPLOY_HOST }}
+      #     username: ${{ secrets.DEPLOY_USER }}
+      #     key: ${{ secrets.DEPLOY_KEY }}
+      #     script: |
+      #       cd /var/www/fittrack-api
+      #       git pull origin main
+      #       composer install --no-dev --optimize-autoloader
+      #       php artisan migrate --force
+      #       php artisan config:cache
+      #       php artisan route:cache
+      #       php artisan view:cache
+      #       php artisan queue:restart
+
+      # Option 2: Deploy to Laravel Forge
+      # - name: Deploy to Forge
+      #   run: |
+      #     curl -X POST ${{ secrets.FORGE_DEPLOYMENT_URL }}
+
+      # Option 3: Deploy to Vapor
+      # - name: Deploy to Vapor
+      #   run: |
+      #     npm install -g @laravel/vapor-cli
+      #     vapor deploy production
+
+      - name: Create deployment artifact
+        run: |
+          mkdir -p deployment
+          tar -czf deployment/release.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='storage/logs/*' \
+            --exclude='.env' \
+            .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-artifact
+          path: deployment/release.tar.gz
+          retention-days: 7
+
+      # Add notification step
+      - name: Deployment notification
+        if: success()
+        run: echo "Deployment completed successfully!"
+        # You can add Slack, Discord, or email notifications here

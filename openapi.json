@@ -1,0 +1,1651 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FitTrack Workout Tracking API",
+    "description": "Multi-tenant workout tracking platform API connecting Gyms, Trainers, and Trainees. Backend API for workout creation, session tracking, and gym management.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "FitTrack API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api/v1",
+      "description": "Local development server"
+    },
+    {
+      "url": "https://api.fittrack.com/v1",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and registration"
+    },
+    {
+      "name": "Profiles",
+      "description": "Trainer and Trainee profile management"
+    },
+    {
+      "name": "Workouts",
+      "description": "Public workout browsing and trainer workout management"
+    },
+    {
+      "name": "Training Plans",
+      "description": "Multi-week training plan management"
+    },
+    {
+      "name": "Workout Sessions",
+      "description": "Workout execution and progress logging"
+    },
+    {
+      "name": "Gyms",
+      "description": "Gym management, equipment, and trainers"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "operationId": "register",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "password_confirmation"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "example": "SecurePass123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "SecurePass123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/User"
+                        },
+                        "token": {
+                          "type": "string",
+                          "example": "1|abc123..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "SecurePass123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/User"
+                        },
+                        "token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "operationId": "logout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "operationId": "me",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profiles/trainer": {
+      "post": {
+        "tags": ["Profiles"],
+        "summary": "Create trainer profile",
+        "operationId": "createTrainerProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainerProfileInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Trainer profile created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TrainerProfile"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get trainer profile",
+        "operationId": "getTrainerProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trainer profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TrainerProfile"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Profiles"],
+        "summary": "Update trainer profile",
+        "operationId": "updateTrainerProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainerProfileInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trainer profile updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Profiles"],
+        "summary": "Delete trainer profile",
+        "operationId": "deleteTrainerProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Trainer profile deleted"
+          }
+        }
+      }
+    },
+    "/profiles/trainee": {
+      "post": {
+        "tags": ["Profiles"],
+        "summary": "Create trainee profile",
+        "operationId": "createTraineeProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TraineeProfileInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Trainee profile created"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get trainee profile",
+        "operationId": "getTraineeProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trainee profile"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Profiles"],
+        "summary": "Update trainee profile",
+        "operationId": "updateTraineeProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TraineeProfileInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trainee profile updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Profiles"],
+        "summary": "Delete trainee profile",
+        "operationId": "deleteTraineeProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Trainee profile deleted"
+          }
+        }
+      }
+    },
+    "/workouts": {
+      "get": {
+        "tags": ["Workouts"],
+        "summary": "List published workouts",
+        "operationId": "listWorkouts",
+        "responses": {
+          "200": {
+            "description": "List of published workouts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Workout"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workouts/{id}": {
+      "get": {
+        "tags": ["Workouts"],
+        "summary": "Get workout details",
+        "operationId": "getWorkout",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workout details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Workout"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trainer/workouts": {
+      "get": {
+        "tags": ["Workouts"],
+        "summary": "List trainer's workouts",
+        "operationId": "listTrainerWorkouts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of trainer's workouts"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Workouts"],
+        "summary": "Create workout",
+        "operationId": "createWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Workout created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Workout"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trainer/workouts/{id}": {
+      "get": {
+        "tags": ["Workouts"],
+        "summary": "Get trainer's workout",
+        "operationId": "getTrainerWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workoutId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workout details"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Workouts"],
+        "summary": "Update workout",
+        "operationId": "updateWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workoutId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workout updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Workouts"],
+        "summary": "Delete workout",
+        "operationId": "deleteWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workoutId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workout deleted"
+          }
+        }
+      }
+    },
+    "/trainer/workouts/{id}/publish": {
+      "post": {
+        "tags": ["Workouts"],
+        "summary": "Publish workout",
+        "operationId": "publishWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workoutId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workout published"
+          }
+        }
+      }
+    },
+    "/trainer/workouts/{id}/archive": {
+      "post": {
+        "tags": ["Workouts"],
+        "summary": "Archive workout",
+        "operationId": "archiveWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workoutId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workout archived"
+          }
+        }
+      }
+    },
+    "/trainer/workouts/{workoutId}/exercises": {
+      "post": {
+        "tags": ["Workouts"],
+        "summary": "Add exercise to workout",
+        "operationId": "addExerciseToWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutExerciseInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercise added to workout"
+          }
+        }
+      }
+    },
+    "/trainer/workouts/{workoutId}/exercises/{exerciseId}": {
+      "patch": {
+        "tags": ["Workouts"],
+        "summary": "Update workout exercise",
+        "operationId": "updateWorkoutExercise",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exerciseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutExerciseInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workout exercise updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Workouts"],
+        "summary": "Remove exercise from workout",
+        "operationId": "removeExerciseFromWorkout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exerciseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Exercise removed from workout"
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "get": {
+        "tags": ["Workout Sessions"],
+        "summary": "List workout sessions",
+        "operationId": "listSessions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "workout_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["started", "in_progress", "completed", "abandoned"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of workout sessions"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Workout Sessions"],
+        "summary": "Start workout session",
+        "operationId": "startSession",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Workout session started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WorkoutSession"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{id}": {
+      "get": {
+        "tags": ["Workout Sessions"],
+        "summary": "Get session details",
+        "operationId": "getSession",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session details"
+          }
+        }
+      }
+    },
+    "/sessions/{id}/complete": {
+      "post": {
+        "tags": ["Workout Sessions"],
+        "summary": "Complete session",
+        "operationId": "completeSession",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session completed"
+          }
+        }
+      }
+    },
+    "/sessions/{id}/abandon": {
+      "post": {
+        "tags": ["Workout Sessions"],
+        "summary": "Abandon session",
+        "operationId": "abandonSession",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session abandoned"
+          }
+        }
+      }
+    },
+    "/sessions/{sessionId}/exercises": {
+      "post": {
+        "tags": ["Workout Sessions"],
+        "summary": "Create exercise log",
+        "operationId": "createExerciseLog",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["workout_exercise_id"],
+                "properties": {
+                  "workout_exercise_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercise log created"
+          }
+        }
+      }
+    },
+    "/sessions/{sessionId}/exercises/{exerciseLogId}/sets": {
+      "post": {
+        "tags": ["Workout Sessions"],
+        "summary": "Log set",
+        "operationId": "logSet",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exerciseLogId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetLogInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Set logged"
+          }
+        }
+      }
+    },
+    "/gyms": {
+      "get": {
+        "tags": ["Gyms"],
+        "summary": "List gyms",
+        "operationId": "listGyms",
+        "responses": {
+          "200": {
+            "description": "List of gyms"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Gyms"],
+        "summary": "Create gym",
+        "operationId": "createGym",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GymInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gym created"
+          }
+        }
+      }
+    },
+    "/gyms/{slug}": {
+      "get": {
+        "tags": ["Gyms"],
+        "summary": "Get gym by slug",
+        "operationId": "getGym",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gym details"
+          }
+        }
+      }
+    },
+    "/gyms/my-gyms": {
+      "get": {
+        "tags": ["Gyms"],
+        "summary": "Get user's gyms",
+        "operationId": "getMyGyms",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user's gyms"
+          }
+        }
+      }
+    },
+    "/trainer/training-plans": {
+      "get": {
+        "tags": ["Training Plans"],
+        "summary": "List trainer's training plans",
+        "operationId": "listTrainerPlans",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of training plans"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Training Plans"],
+        "summary": "Create training plan",
+        "operationId": "createTrainingPlan",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainingPlanInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Training plan created"
+          }
+        }
+      }
+    },
+    "/trainer/training-plans/{id}/generate-structure": {
+      "post": {
+        "tags": ["Training Plans"],
+        "summary": "Generate plan structure",
+        "operationId": "generatePlanStructure",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Structure generated"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Sanctum"
+      }
+    },
+    "parameters": {
+      "workoutId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "sessionId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "email_verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "trainer_profile": {
+            "$ref": "#/components/schemas/TrainerProfile",
+            "nullable": true
+          },
+          "trainee_profile": {
+            "$ref": "#/components/schemas/TraineeProfile",
+            "nullable": true
+          }
+        }
+      },
+      "TrainerProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "specializations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "years_experience": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "TrainerProfileInput": {
+        "type": "object",
+        "required": ["display_name"],
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "John's Fitness"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "specializations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "years_experience": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "TraineeProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "fitness_goal": {
+            "type": "string",
+            "enum": ["strength", "hypertrophy", "endurance", "weight_loss", "general_fitness", "sport_specific"]
+          },
+          "experience_level": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced", "expert"]
+          }
+        }
+      },
+      "TraineeProfileInput": {
+        "type": "object",
+        "required": ["display_name"],
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "fitness_goal": {
+            "type": "string",
+            "enum": ["strength", "hypertrophy", "endurance", "weight_loss", "general_fitness", "sport_specific"]
+          },
+          "experience_level": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced", "expert"]
+          },
+          "height_cm": {
+            "type": "number",
+            "format": "float"
+          },
+          "weight_kg": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "Workout": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced", "expert"]
+          },
+          "estimated_duration_minutes": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"]
+          },
+          "creator": {
+            "$ref": "#/components/schemas/TrainerProfile"
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkoutExercise"
+            }
+          }
+        }
+      },
+      "WorkoutInput": {
+        "type": "object",
+        "required": ["name", "difficulty"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 150,
+            "example": "Full Body Strength"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced", "expert"]
+          },
+          "estimated_duration_minutes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "WorkoutExercise": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "sets": {
+            "type": "integer"
+          },
+          "target_reps": {
+            "type": "integer",
+            "nullable": true
+          },
+          "target_duration_seconds": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rest_seconds": {
+            "type": "integer"
+          },
+          "sort_order": {
+            "type": "integer"
+          }
+        }
+      },
+      "WorkoutExerciseInput": {
+        "type": "object",
+        "required": ["exercise_id", "sets", "rest_seconds"],
+        "properties": {
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sets": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "target_reps": {
+            "type": "integer",
+            "nullable": true
+          },
+          "target_duration_seconds": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rest_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 60
+          },
+          "sort_order": {
+            "type": "integer"
+          }
+        }
+      },
+      "WorkoutSession": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workout": {
+            "$ref": "#/components/schemas/Workout"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["started", "in_progress", "completed", "abandoned"]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "total_duration_seconds": {
+            "type": "integer",
+            "nullable": true
+          },
+          "exercise_logs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SessionInput": {
+        "type": "object",
+        "required": ["workout_id"],
+        "properties": {
+          "workout_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "training_plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "SetLogInput": {
+        "type": "object",
+        "required": ["set_number"],
+        "properties": {
+          "set_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "actual_reps": {
+            "type": "integer",
+            "nullable": true
+          },
+          "actual_duration_seconds": {
+            "type": "integer",
+            "nullable": true
+          },
+          "weight_kg": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "rpe": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "nullable": true,
+            "description": "Rate of Perceived Exertion"
+          },
+          "is_warmup": {
+            "type": "boolean",
+            "default": false
+          },
+          "is_failure": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "GymInput": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "address_line1": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          }
+        }
+      },
+      "TrainingPlanInput": {
+        "type": "object",
+        "required": ["name", "difficulty", "duration_weeks", "days_per_week"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced", "expert"]
+          },
+          "duration_weeks": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "days_per_week": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7
+          },
+          "goal": {
+            "type": "string",
+            "enum": ["strength", "hypertrophy", "endurance", "weight_loss", "general_fitness", "sport_specific"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "ValidationError": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "The given data was invalid."
+                },
+                "errors": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthenticated."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
